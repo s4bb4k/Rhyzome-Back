@@ -1,0 +1,67 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de entorno virtual
+venv/
+env/
+ENV/
+.venv/
+
+# Archivos de configuración de PyCharm
+.idea/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de logs
+*.log
+
+# Archivos de entorno (variables sensibles)
+.env
+
+# Archivos de cobertura y testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Archivos de build / distribución
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Archivos temporales
+*.tmp
+*.swp
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Archivos de cache de herramientas
+.mypy_cache/
+.cache/
+.ruff_cache/
+
+# Archivos SQLite (si no quieres versionarlos)
+*.sqlite3
+
+# Archivos de configuración local
+*.local
+
+# Archivos de VSCode (si usas ambos)
+.vscode/
+
+# Archivos de packaging
+pip-wheel-metadata/
+
+application/services/__pycache__
+
+# Variables de entorno y secretos
+.env
+
+# Caché de Python
+__pycache__/
+*.py[cod]

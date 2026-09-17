@@ -1,0 +1,7 @@
+generator,model,train_samples,test_samples,r2,mae,rmse,artifact
+cellular,random_forest,400,100,0.987183,0.316838,0.652697,models/cellular_random_forest.joblib
+cellular,svm,400,100,0.998023,0.069702,0.256359,models/cellular_svm.joblib
+cellular,mlp,400,100,0.994166,0.314822,0.440352,models/cellular_mlp.joblib
+perlin,random_forest,400,100,0.992233,0.970681,1.241081,models/perlin_random_forest.joblib
+perlin,svm,400,100,0.99161,0.249545,1.289926,models/perlin_svm.joblib
+perlin,mlp,400,100,0.985036,1.195089,1.722671,models/perlin_mlp.joblib

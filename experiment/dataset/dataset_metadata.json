@@ -1,0 +1,22 @@
+{
+  "experiment_seed": 20260909,
+  "samples_per_generator": 500,
+  "total_maps": 1000,
+  "generators": [
+    "cellular",
+    "perlin"
+  ],
+  "feature_names": [
+    "connectivity",
+    "accessibility",
+    "obstacle_density",
+    "connected_components",
+    "largest_open_area",
+    "border_obstacle_ratio",
+    "balance"
+  ],
+  "map_encoding": {
+    "0": "transitable",
+    "1": "obstacle"
+  }
+}

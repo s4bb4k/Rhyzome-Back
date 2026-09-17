@@ -1,0 +1,72 @@
+{
+  "generated_at": "2026-09-09T02:47:41.635688+00:00",
+  "total_maps": 1000,
+  "samples_per_generator": 500,
+  "selection_rule": "Mayor R²; menor MAE como desempate",
+  "results": [
+    {
+      "generator": "cellular",
+      "model": "random_forest",
+      "train_samples": 400,
+      "test_samples": 100,
+      "r2": 0.987183,
+      "mae": 0.316838,
+      "rmse": 0.652697,
+      "artifact": "models/cellular_random_forest.joblib"
+    },
+    {
+      "generator": "cellular",
+      "model": "svm",
+      "train_samples": 400,
+      "test_samples": 100,
+      "r2": 0.998023,
+      "mae": 0.069702,
+      "rmse": 0.256359,
+      "artifact": "models/cellular_svm.joblib"
+    },
+    {
+      "generator": "cellular",
+      "model": "mlp",
+      "train_samples": 400,
+      "test_samples": 100,
+      "r2": 0.994166,
+      "mae": 0.314822,
+      "rmse": 0.440352,
+      "artifact": "models/cellular_mlp.joblib"
+    },
+    {
+      "generator": "perlin",
+      "model": "random_forest",
+      "train_samples": 400,
+      "test_samples": 100,
+      "r2": 0.992233,
+      "mae": 0.970681,
+      "rmse": 1.241081,
+      "artifact": "models/perlin_random_forest.joblib"
+    },
+    {
+      "generator": "perlin",
+      "model": "svm",
+      "train_samples": 400,
+      "test_samples": 100,
+      "r2": 0.99161,
+      "mae": 0.249545,
+      "rmse": 1.289926,
+      "artifact": "models/perlin_svm.joblib"
+    },
+    {
+      "generator": "perlin",
+      "model": "mlp",
+      "train_samples": 400,
+      "test_samples": 100,
+      "r2": 0.985036,
+      "mae": 1.195089,
+      "rmse": 1.722671,
+      "artifact": "models/perlin_mlp.joblib"
+    }
+  ],
+  "winners": {
+    "cellular": "svm",
+    "perlin": "random_forest"
+  }
+}

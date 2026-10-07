@@ -74,7 +74,7 @@ class ApiTestCase(unittest.TestCase):
         })
         body = response.get_json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body["selected_model"], "svm")
+        self.assertEqual(body["selected_model"], "MLP")
         self.assertEqual(body["attempts"], 2)
         self.assertEqual(len(body["map"]), 20)
 
@@ -93,7 +93,10 @@ class ApiTestCase(unittest.TestCase):
     def test_experiment_summary(self):
         response = self.client.get("/api/experiment")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json()["dataset"]["total_maps"], 1000)
+        self.assertEqual(response.get_json()["dataset"]["total_maps"], 10000)
+        self.assertEqual(response.get_json()["dataset"]["by_generator"]["Perlin Noise"], 7500)
+        self.assertEqual(response.get_json()["winners"]["perlin"]["model"], "Regresión Logística")
+        self.assertEqual(response.get_json()["winners"]["cellular"]["model"], "MLP")
 
     def test_training_map_can_be_inspected(self):
         response = self.client.get("/api/experiment/maps/cellular-0001")

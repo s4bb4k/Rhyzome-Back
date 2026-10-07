@@ -203,3 +203,20 @@ python -m application.services.train_model --samples-per-generator 500
 ```
 
 Las pruebas cubren salud, ambos generadores, reproducibilidad, dimensiones, contrato del dashboard, recomendación para mazmorra, evaluación, validaciones, evidencia experimental y CORS de Vite.
+
+## Integración del experimento final de 10.000 mapas
+
+Esta versión consume directamente los artefactos generados por `experimento_rhyzome_10000_ARTEFACTOS_BACKEND.ipynb`.
+
+- Perlin Noise (Bosque, Desierto y Ciudad): `experiment/artifacts/models/best_perlin.joblib` — Regresión Logística.
+- Autómatas Celulares (Mazmorra): `experiment/artifacts/models/best_cellular.joblib` — MLP.
+- Las 10 características de inferencia se leen de `experiment/artifacts/feature_config.json`.
+- Dataset, validación, ganadores, versiones y hashes se leen de `experiment/artifacts/experiment_manifest.json`.
+- `GET /api/experiment` expone la trazabilidad del experimento final (10.000 mapas).
+- `POST /api/maps/generate-adaptive` genera varios candidatos con los perfiles de complejidad usados en el experimento y selecciona el mejor según el modelo ganador del generador.
+
+Los archivos de `experiment/dataset/` son una muestra local para inspección y no representan la totalidad de los 10.000 mapas del experimento final.
+
+### Compatibilidad de modelos
+
+Los modelos fueron serializados con scikit-learn 1.6.1; `requirements.txt` fija esa misma versión para evitar incompatibilidades de deserialización.

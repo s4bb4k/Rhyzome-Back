@@ -9,7 +9,7 @@ map_bp = Blueprint("maps", __name__)
 TERRAIN_ALIASES = {
     "forest": "bosque", "bosque": "bosque",
     "desert": "desierto", "desierto": "desierto",
-    "urban": "urbano", "urbano": "urbano", "ciudad": "urbano",
+    "urban": "ciudad", "urbano": "ciudad", "ciudad": "ciudad",
     "dungeon": "mazmorra", "mazmorra": "mazmorra",
 }
 
@@ -39,7 +39,7 @@ def _frontend_config(data):
     raw_terrain = str(data.get("terrain_type", data.get("map_type", "bosque"))).lower()
     terrain_type = TERRAIN_ALIASES.get(raw_terrain)
     if terrain_type is None:
-        raise ValueError("'terrain_type' debe ser bosque, desierto, urbano o mazmorra")
+        raise ValueError("'terrain_type' debe ser bosque, desierto, ciudad o mazmorra")
     complexity = str(data.get("complexity", "medium")).lower()
     complexity_aliases = {
         "low": "low", "bajo": "low", "medium": "medium", "medio": "medium",
@@ -77,8 +77,10 @@ def generate_map():
         if algorithm == "cellular":
             probability = _number(data, "probability", 0.45, 0.0, 1.0)
             iterations = _integer(data, "iterations", 4, 0, 20)
-            grid = generate_cellular_map(width, height, probability, iterations, seed)
-            parameters = {"probability": probability, "iterations": iterations}
+            birth_limit = _integer(data, "birth_limit", 4, 1, 8)
+            death_limit = _integer(data, "death_limit", 3, 1, 8)
+            grid = generate_cellular_map(width, height, probability, iterations, seed, birth_limit, death_limit)
+            parameters = {"probability": probability, "iterations": iterations, "birth_limit": birth_limit, "death_limit": death_limit}
         elif algorithm == "perlin":
             scale = _number(data, "scale", 0.08, 0.005, 1.0)
             octaves = _integer(data, "octaves", 4, 1, 8)
@@ -138,11 +140,14 @@ def generate_adaptive():
             "width": _integer(data, "width", 50, 10, 200),
             "height": _integer(data, "height", 35, 10, 200),
             "seed": seed,
+            "terrain_type": frontend["terrain_type"],
         }
         if algorithm == "cellular":
             config.update({
                 "probability": _number(data, "probability", 0.45, 0.0, 1.0),
                 "iterations": _integer(data, "iterations", 4, 0, 20),
+                "birth_limit": _integer(data, "birth_limit", 4, 1, 8),
+                "death_limit": _integer(data, "death_limit", 3, 1, 8),
             })
         else:
             config.update({
@@ -152,7 +157,8 @@ def generate_adaptive():
                 "threshold": _number(data, "threshold", 0.5, 0.0, 1.0),
             })
         attempts = _integer(data, "attempts", 10, 1, 50)
-        result = generate_adaptive_map_ml(algorithm, config, attempts)
+        complexity_ml = {"low": "bajo", "medium": "medio", "high": "alto"}[frontend["complexity"]]
+        result = generate_adaptive_map_ml(algorithm, config, attempts, complexity_ml)
         return jsonify({"status": "success", "ui_config": frontend, **result})
     except ValueError as exc:
         return jsonify({"status": "error", "message": str(exc)}), 400

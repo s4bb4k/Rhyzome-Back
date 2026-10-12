@@ -1,12 +1,12 @@
 import csv
 import json
 from pathlib import Path
-
 from flask import Blueprint, jsonify, request
 
 experiment_bp = Blueprint("experiment", __name__)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 EXPERIMENT_DIR = PROJECT_ROOT / "experiment"
+ARTIFACT_DIR = EXPERIMENT_DIR / "artifacts"
 
 
 def _read_json(path):
@@ -19,9 +19,16 @@ def _read_json(path):
 @experiment_bp.get("")
 def summary():
     try:
-        metadata = _read_json(EXPERIMENT_DIR / "dataset" / "dataset_metadata.json")
-        results = _read_json(EXPERIMENT_DIR / "artifacts" / "experiment_results.json")
-        return jsonify({"status": "success", "dataset": metadata, "experiment": results})
+        manifest = _read_json(ARTIFACT_DIR / "experiment_manifest.json")
+        results = _read_json(ARTIFACT_DIR / "experiment_results.json")
+        features = _read_json(ARTIFACT_DIR / "feature_config.json")
+        return jsonify({"status": "success", "dataset": manifest["dataset"],
+                        "validation": manifest["validation"], "winners": manifest["winners"],
+                        "features": features, "experiment": results,
+                        "provenance": {"generated_at_utc": manifest["generated_at_utc"],
+                                       "generated_by": manifest["generated_by"],
+                                       "versions": manifest["versions"],
+                                       "artifacts_sha256": manifest["artifacts_sha256"]}})
     except FileNotFoundError as exc:
         return jsonify({"status": "error", "message": str(exc)}), 404
 
@@ -36,16 +43,16 @@ def list_maps():
         offset = max(int(request.args.get("offset", 0)), 0)
     except ValueError:
         return jsonify({"status": "error", "message": "limit y offset deben ser enteros"}), 400
-
     index_path = EXPERIMENT_DIR / "dataset" / "dataset_index.csv"
     if not index_path.exists():
-        return jsonify({"status": "error", "message": "Dataset no disponible"}), 404
+        return jsonify({"status": "error", "message": "Muestra local del dataset no disponible"}), 404
     with index_path.open(encoding="utf-8") as file:
         rows = list(csv.DictReader(file))
     if generator:
         rows = [row for row in rows if row["generator"] == generator]
-    return jsonify({"status": "success", "total": len(rows), "offset": offset,
-                    "limit": limit, "maps": rows[offset:offset + limit]})
+    return jsonify({"status": "success", "note": "Muestra local; el experimento final contiene 10.000 mapas.",
+                    "total": len(rows), "offset": offset, "limit": limit,
+                    "maps": rows[offset:offset + limit]})
 
 
 @experiment_bp.get("/maps/<map_id>")
@@ -57,6 +64,7 @@ def get_map(map_id):
         return jsonify({"status": "error", "message": "Identificador no válido"}), 400
     path = EXPERIMENT_DIR / "dataset" / "maps" / generator / f"{map_id}.json"
     try:
-        return jsonify({"status": "success", "training_map": _read_json(path)})
+        return jsonify({"status": "success", "training_map": _read_json(path),
+                        "note": "Mapa perteneciente a la muestra local del repositorio."})
     except FileNotFoundError:
         return jsonify({"status": "error", "message": "Mapa no encontrado"}), 404

@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "generated_at_utc": "2026-10-04T21:40:36.697021+00:00",
+  "generated_by": "experimento_rhyzome_10000_ARTEFACTOS_BACKEND.ipynb",
+  "dataset": {
+    "total_maps": 10000,
+    "by_generator": {
+      "Perlin Noise": 7500,
+      "Autómatas Celulares": 2500
+    },
+    "by_map_type": {
+      "bosque": 2500,
+      "desierto": 2500,
+      "ciudad": 2500,
+      "mazmorra": 2500
+    }
+  },
+  "validation": {
+    "test_size": 0.2,
+    "cv_folds": 5,
+    "experiment_seeds": [
+      42,
+      123,
+      2026
+    ],
+    "deployment_seed": 42,
+    "selection_metric": "CV F1 macro global",
+    "selection_rule": "Mayor F1 Macro promedio entre semillas; ROC-AUC e inferencia como criterios secundarios"
+  },
+  "models_evaluated": [
+    "Regresión Logística",
+    "KNN",
+    "Random Forest",
+    "SVM (RBF)",
+    "Gradient Boosting",
+    "MLP"
+  ],
+  "features": [
+    "width",
+    "height",
+    "floor_ratio",
+    "n_regions",
+    "largest_region_ratio",
+    "edge_density",
+    "row_entropy",
+    "col_entropy",
+    "local_variance",
+    "perimeter_area_ratio"
+  ],
+  "winners": {
+    "perlin": {
+      "model": "Regresión Logística",
+      "maps": 7500,
+      "artifact": "models/best_perlin.joblib",
+      "metrics": {
+        "CV F1 macro global": 0.8202626122042731,
+        "CV F1 desv entre semillas": 0.0008387291433882969,
+        "Accuracy": 0.8217777777777777,
+        "Balanced Accuracy": 0.8217777777777777,
+        "Precision macro": 0.8215598294096728,
+        "Recall macro": 0.8217777777777777,
+        "F1 macro": 0.8207342177621463,
+        "ROC-AUC OVR macro": 0.9439113333333333,
+        "Entrenamiento (s)": 0.1358661753333763,
+        "Inferencia (ms/mapa)": 0.0019150126666621266
+      }
+    },
+    "cellular": {
+      "model": "MLP",
+      "maps": 2500,
+      "artifact": "models/best_cellular.joblib",
+      "metrics": {
+        "CV F1 macro global": 0.8053788021640288,
+        "CV F1 desv entre semillas": 0.019512958786082384,
+        "Accuracy": 0.8293333333333334,
+        "Balanced Accuracy": 0.8293012368836624,
+        "Precision macro": 0.8359663731692387,
+        "Recall macro": 0.8293012368836624,
+        "F1 macro": 0.8304269829874217,
+        "ROC-AUC OVR macro": 0.9466892463008665,
+        "Entrenamiento (s)": 0.5884460470000098,
+        "Inferencia (ms/mapa)": 0.010935091333521996
+      }
+    }
+  },
+  "versions": {
+    "python": "3.13.15",
+    "scikit_learn": "1.6.1",
+    "joblib": "1.6.0",
+    "numpy": "2.1.3",
+    "pandas": "2.2.3"
+  },
+  "artifacts_sha256": {
+    "models/best_perlin.joblib": "13695adf79c3e6badc04298671c685ffc748ed33f41f78e9fa4343d88de7e59a",
+    "models/best_cellular.joblib": "34399f629126748e66f9504f30b8466e132661893e75f9572bb4e4d52eeab3d3"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "version": "final-10000",
+  "total_maps": 10000,
+  "distribution": {
+    "perlin": {"total": 7500, "terrains": ["bosque", "desierto", "ciudad"]},
+    "cellular": {"total": 2500, "terrains": ["mazmorra"]}
+  },
+  "complexity_levels": ["bajo", "medio", "alto"],
+  "cross_validation": {"type": "StratifiedKFold", "folds": 5, "seeds": [42, 123, 2026]},
+  "primary_selection_metric": "f1_macro_cv",
+  "winners": {
+    "perlin": {
+      "model": "logistic_regression",
+      "cv_f1_macro": 0.8203,
+      "accuracy": 0.8218,
+      "test_f1_macro": 0.8207,
+      "roc_auc_ovr_macro": 0.9439,
+      "seed_std": 0.0008,
+      "inference_ms_per_map": 0.0053
+    },
+    "cellular": {
+      "model": "mlp",
+      "cv_f1_macro": 0.8054,
+      "accuracy": 0.8293,
+      "test_f1_macro": 0.8304,
+      "roc_auc_ovr_macro": 0.9467,
+      "seed_std": 0.0195,
+      "inference_ms_per_map": 0.0059
+    }
+  },
+  "deployment_mapping": {
+    "bosque": {"generator": "perlin", "ml_model": "logistic_regression"},
+    "desierto": {"generator": "perlin", "ml_model": "logistic_regression"},
+    "ciudad": {"generator": "perlin", "ml_model": "logistic_regression"},
+    "mazmorra": {"generator": "cellular", "ml_model": "mlp"}
+  },
+  "structural_metrics": [
+    "floor_ratio", "largest_region_ratio", "n_regions", "edge_density",
+    "local_variance", "row_entropy", "col_entropy", "perimeter_area_ratio", "complexity_score"
+  ],
+  "note": "Resultados finales incorporados desde la documentación experimental del proyecto. El directorio dataset/ del ZIP es una muestra auditable anterior y no contiene físicamente los 10.000 mapas."
+}

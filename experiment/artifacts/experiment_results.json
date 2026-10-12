@@ -1,72 +1,43 @@
 {
-  "generated_at": "2026-09-09T02:47:41.635688+00:00",
-  "total_maps": 1000,
-  "samples_per_generator": 500,
-  "selection_rule": "Mayor R²; menor MAE como desempate",
-  "results": [
-    {
-      "generator": "cellular",
-      "model": "random_forest",
-      "train_samples": 400,
-      "test_samples": 100,
-      "r2": 0.987183,
-      "mae": 0.316838,
-      "rmse": 0.652697,
-      "artifact": "models/cellular_random_forest.joblib"
-    },
-    {
-      "generator": "cellular",
-      "model": "svm",
-      "train_samples": 400,
-      "test_samples": 100,
-      "r2": 0.998023,
-      "mae": 0.069702,
-      "rmse": 0.256359,
-      "artifact": "models/cellular_svm.joblib"
-    },
-    {
-      "generator": "cellular",
-      "model": "mlp",
-      "train_samples": 400,
-      "test_samples": 100,
-      "r2": 0.994166,
-      "mae": 0.314822,
-      "rmse": 0.440352,
-      "artifact": "models/cellular_mlp.joblib"
-    },
-    {
-      "generator": "perlin",
-      "model": "random_forest",
-      "train_samples": 400,
-      "test_samples": 100,
-      "r2": 0.992233,
-      "mae": 0.970681,
-      "rmse": 1.241081,
-      "artifact": "models/perlin_random_forest.joblib"
-    },
-    {
-      "generator": "perlin",
-      "model": "svm",
-      "train_samples": 400,
-      "test_samples": 100,
-      "r2": 0.99161,
-      "mae": 0.249545,
-      "rmse": 1.289926,
-      "artifact": "models/perlin_svm.joblib"
-    },
-    {
-      "generator": "perlin",
-      "model": "mlp",
-      "train_samples": 400,
-      "test_samples": 100,
-      "r2": 0.985036,
-      "mae": 1.195089,
-      "rmse": 1.722671,
-      "artifact": "models/perlin_mlp.joblib"
-    }
+  "selection_metric": "CV F1 macro global",
+  "secondary_criteria": [
+    "ROC-AUC OVR macro",
+    "Inferencia (ms/mapa)"
   ],
   "winners": {
-    "cellular": "svm",
-    "perlin": "random_forest"
+    "perlin": {
+      "model": "Regresión Logística",
+      "maps": 7500,
+      "artifact": "models/best_perlin.joblib",
+      "metrics": {
+        "CV F1 macro global": 0.8202626122042731,
+        "CV F1 desv entre semillas": 0.0008387291433882969,
+        "Accuracy": 0.8217777777777777,
+        "Balanced Accuracy": 0.8217777777777777,
+        "Precision macro": 0.8215598294096728,
+        "Recall macro": 0.8217777777777777,
+        "F1 macro": 0.8207342177621463,
+        "ROC-AUC OVR macro": 0.9439113333333333,
+        "Entrenamiento (s)": 0.1358661753333763,
+        "Inferencia (ms/mapa)": 0.0019150126666621266
+      }
+    },
+    "cellular": {
+      "model": "MLP",
+      "maps": 2500,
+      "artifact": "models/best_cellular.joblib",
+      "metrics": {
+        "CV F1 macro global": 0.8053788021640288,
+        "CV F1 desv entre semillas": 0.019512958786082384,
+        "Accuracy": 0.8293333333333334,
+        "Balanced Accuracy": 0.8293012368836624,
+        "Precision macro": 0.8359663731692387,
+        "Recall macro": 0.8293012368836624,
+        "F1 macro": 0.8304269829874217,
+        "ROC-AUC OVR macro": 0.9466892463008665,
+        "Entrenamiento (s)": 0.5884460470000098,
+        "Inferencia (ms/mapa)": 0.010935091333521996
+      }
+    }
   }
 }

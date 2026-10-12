@@ -1,0 +1,31 @@
+{
+  "features": [
+    "width",
+    "height",
+    "floor_ratio",
+    "n_regions",
+    "largest_region_ratio",
+    "edge_density",
+    "row_entropy",
+    "col_entropy",
+    "local_variance",
+    "perimeter_area_ratio"
+  ],
+  "target": "complexity_requested",
+  "target_classes": [
+    "alto",
+    "bajo",
+    "medio"
+  ],
+  "target_encoding": {
+    "alto": 0,
+    "bajo": 1,
+    "medio": 2
+  },
+  "generator_by_map_type": {
+    "Bosque": "Perlin Noise",
+    "Desierto": "Perlin Noise",
+    "Ciudad": "Perlin Noise",
+    "Mazmorra": "Autómatas Celulares"
+  }
+}

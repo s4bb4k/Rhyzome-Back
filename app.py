@@ -18,7 +18,7 @@ def create_app():
     # 2. Configurar los orígenes permitidos
     if environment == "production":
         origins = [
-            "https://rhyzome-front-lilac.vercel.app/"
+            "https://rhyzome-front-lilac.vercel.app"
         ]
     else:
         origins = [

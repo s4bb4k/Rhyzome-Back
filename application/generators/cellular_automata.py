@@ -1,30 +1,31 @@
-import random
+import numpy as np
 
-def generate_map(ancho, alto, probabilidad, iteraciones, seed=None):
-    rng = random.Random(seed)
 
-    grid = [
-        [1 if rng.random() < probabilidad else 0 for _ in range(ancho)]
-        for _ in range(alto)
-    ]
+def _neighbor_count(grid):
+    padded = np.pad(grid, 1, constant_values=0)
+    count = np.zeros_like(grid, dtype=int)
+    for dy in range(3):
+        for dx in range(3):
+            if dx != 1 or dy != 1:
+                count += padded[dy:dy + grid.shape[0], dx:dx + grid.shape[1]]
+    return count
 
+
+def generate_map(ancho, alto, probabilidad=0.47, iteraciones=5, seed=42,
+                 birth_limit=4, death_limit=3):
+    """Autómata celular usado por el experimento final de 10.000 mapas."""
+    seed = 42 if seed is None else int(seed)
+    rng = np.random.default_rng(seed)
+    grid = (rng.random((alto, ancho)) > probabilidad).astype(np.uint8)
+    grid[[0, -1], :] = 0
+    grid[:, [0, -1]] = 0
     for _ in range(iteraciones):
-        new_grid = []
-        for y in range(alto):
-            row = []
-            for x in range(ancho):
-                vecinos = 0
-                for dy in [-1, 0, 1]:
-                    for dx in [-1, 0, 1]:
-                        ny, nx = y + dy, x + dx
-                        if dx == 0 and dy == 0:
-                            continue
-                        if 0 <= ny < alto and 0 <= nx < ancho:
-                            vecinos += grid[ny][nx]
-                        else:
-                            vecinos += 1
-                row.append(1 if vecinos >= 5 else 0)
-            new_grid.append(row)
-        grid = new_grid
-
-    return grid
+        neighbors = _neighbor_count(grid)
+        grid = np.where(
+            grid == 1,
+            neighbors >= death_limit,
+            neighbors > birth_limit,
+        ).astype(np.uint8)
+        grid[[0, -1], :] = 0
+        grid[:, [0, -1]] = 0
+    return grid.tolist()

@@ -3,6 +3,7 @@ Flask-Cors>=6,<7
 joblib>=1.5,<2
 pandas>=2.2,<4
 python-dotenv>=1.1,<2
-scikit-learn==1.8.0
+scikit-learn==1.6.1
 supabase>=2.18,<3
 gunicorn>=23,<24
+numpy==2.1.3

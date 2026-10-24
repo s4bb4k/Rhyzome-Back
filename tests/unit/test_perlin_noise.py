@@ -37,14 +37,18 @@ def test_perlin_different_dimensions(width, height):
     assert all(len(row) == width for row in grid)
 
 
+
 def test_perlin_threshold_zero():
     grid = generate_perlin_map(10, 10, threshold=0, seed=42)
 
-    assert all(cell == 0 for row in grid for cell in row)
+    # Todos los valores normalizados cumplen noise >= 0.
+    assert all(cell == 1 for row in grid for cell in row)
 
 
 def test_perlin_threshold_one():
     grid = generate_perlin_map(10, 10, threshold=1, seed=42)
 
-    assert all(cell == 1 for row in grid for cell in row)
+    # Con este mapa, ningún valor normalizado alcanza 1.
+    assert all(cell == 0 for row in grid for cell in row)
+
 

@@ -28,11 +28,23 @@ def test_number_invalid(value):
         _number({'probability': value}, 'probability', 0.5, 0, 1)
 
 
+
 @pytest.mark.parametrize('terrain,expected', [
-    ('Bosque', 'bosque'), ('desert', 'desierto'), ('ciudad', 'urbano'),
-    ('dungeon', 'mazmorra')])
+    ('Bosque', 'bosque'),
+    ('forest', 'bosque'),
+    ('desert', 'desierto'),
+    ('desierto', 'desierto'),
+    ('ciudad', 'ciudad'),
+    ('urbano', 'ciudad'),
+    ('urban', 'ciudad'),
+    ('dungeon', 'mazmorra'),
+    ('mazmorra', 'mazmorra'),
+])
 def test_terrain_aliases(terrain, expected):
-    assert _frontend_config({'terrain_type': terrain})['terrain_type'] == expected
+    result = _frontend_config({'terrain_type': terrain})
+
+    assert result['terrain_type'] == expected
+
 
 
 @pytest.mark.parametrize('complexity,expected', [('bajo', 'low'), ('medio', 'medium'), ('alto', 'high')])

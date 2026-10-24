@@ -8,6 +8,7 @@ ML_FEATURE_NAMES = [
     "perimeter_area_ratio",
 ]
 
+FEATURE_NAMES = ML_FEATURE_NAMES.copy()
 
 def _binary_entropy(values):
     arr = np.clip(np.asarray(values, dtype=float), 1e-9, 1 - 1e-9)

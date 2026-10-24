@@ -40,18 +40,28 @@ def test_cellular_different_dimensions(width, height):
 def test_cellular_zero_probability_without_iterations():
     grid = generate_map(10, 10, 0.0, 0, seed=42)
 
-    assert all(cell == 0 for row in grid for cell in row)
+    # Los bordes siempre tienen valor 0.
+    assert all(cell == 0 for cell in grid[0])
+    assert all(cell == 0 for cell in grid[-1])
+    assert all(row[0] == 0 and row[-1] == 0 for row in grid)
+
+    # Con probabilidad 0, las celdas interiores son 1.
+    assert all(
+        grid[y][x] == 1
+        for y in range(1, 9)
+        for x in range(1, 9)
+    )
 
 
 def test_cellular_full_probability_without_iterations():
     grid = generate_map(10, 10, 1.0, 0, seed=42)
 
-    assert all(cell == 1 for row in grid for cell in row)
+    assert all(cell == 0 for row in grid for cell in row)
 
 
-def test_cellular_iterations_change_expected_grid():
+def test_cellular_iterations_preserve_border():
     initial = generate_map(1, 1, 0.0, 0, seed=42)
     evolved = generate_map(1, 1, 0.0, 1, seed=42)
 
     assert initial == [[0]]
-    assert evolved == [[1]]
+    assert evolved == [[0]]

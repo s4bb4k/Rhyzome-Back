@@ -73,7 +73,12 @@ def create_app():
 
     return app
 
-
+    @app.route("/api/python-version", methods=["GET"])
+    def python_version():
+        return jsonify({
+            "python_version": sys.version.split()[0],
+            "python_full_version": sys.version,
+        })
 app = create_app()
 
 if __name__ == "__main__":

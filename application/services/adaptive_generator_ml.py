@@ -10,6 +10,11 @@ from application.generators.perlin_noise import generate_perlin_map
 from application.services.evaluation_metrics import evaluar_mapa
 from application.services.feature_extractor import extract_ml_feature_dict
 
+import logging
+from time import perf_counter
+
+from functools import lru_cache
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 ARTIFACT_DIR = PROJECT_ROOT / "experiment" / "artifacts"
 MODEL_DIR = ARTIFACT_DIR / "models"
@@ -20,10 +25,20 @@ def _read_json(name):
         return json.load(f)
 
 
+@lru_cache(maxsize=2)
 def _load_model(generator):
+    logging.warning(
+        "[HU-78] Estado cache ML: %s",
+        _load_model.cache_info()
+    )
     path = MODEL_DIR / f"best_{generator}.joblib"
+
     if not path.exists():
-        raise FileNotFoundError(f"No existe {path.name}; genere los artefactos desde el notebook final")
+        raise FileNotFoundError(
+            f"No existe {path.name}; "
+            "genere los artefactos desde el notebook final"
+        )
+
     return joblib.load(path)
 
 
@@ -56,49 +71,204 @@ def _candidate(generator, config, seed, target):
     return grid, {"octaves": octaves, "persistence": persistence, "threshold": threshold}
 
 
-def generate_adaptive_map_ml(generator, config, attempts=10, requested_complexity="medio"):
+def generate_adaptive_map_ml(
+    generator,
+    config,
+    attempts=10,
+    requested_complexity="medio"
+):
+    # ==========================================
+    # HU-78: Diagnostico de rendimiento
+    # ==========================================
+    start_total = perf_counter()
+
     if not isinstance(attempts, int) or not 1 <= attempts <= 50:
         raise ValueError("'attempts' debe estar entre 1 y 50")
 
+    # ==========================================
+    # 1. Carga del modelo Machine Learning
+    # ==========================================
+    start_model = perf_counter()
+
     model = _load_model(generator)
+
+    elapsed_model = (perf_counter() - start_model) * 1000
+
+    logging.warning("[HU-78] Carga del modelo ML: %.2f ms", elapsed_model)
+    cache_info = getattr(_load_model, "cache_info", None)
+
+    if callable(cache_info):
+        logging.warning(
+            "[HU-78] Estado cache ML: %s",
+            cache_info()
+        )
+
+    # ==========================================
+    # 2. Carga de archivos de configuracion
+    # ==========================================
+    start_config = perf_counter()
+
     feature_config = _read_json("feature_config.json")
     manifest = _read_json("experiment_manifest.json")
+
     features = feature_config["features"]
     encoding = feature_config["target_encoding"]
+
     target = requested_complexity.lower()
+
     if target not in encoding:
         raise ValueError("Complejidad ML debe ser bajo, medio o alto")
 
+    elapsed_config = (perf_counter() - start_config) * 1000
+
+    logging.warning(
+        "[HU-78] Carga de configuracion: %.2f ms",
+        elapsed_config
+    )
+
+    # ==========================================
+    # 3. Inicializacion de candidatos
+    # ==========================================
     rng = random.Random(config.get("seed"))
     candidates = []
+
+    # Acumuladores de tiempos
+    time_generation = 0.0
+    time_features = 0.0
+    time_prediction = 0.0
+    time_evaluation = 0.0
+
+    inverse = {int(v): k for k, v in encoding.items()}
+
+    # ==========================================
+    # 4. Generacion y evaluacion de candidatos
+    # ==========================================
+    start_candidates = perf_counter()
+
     for _ in range(attempts):
+
         seed = rng.randint(1, 2_147_483_647)
-        grid, generated_parameters = _candidate(generator, config, seed, target)
+
+        # --------------------------------------
+        # 4.1 Generacion procedural
+        # --------------------------------------
+        start = perf_counter()
+
+        grid, generated_parameters = _candidate(
+            generator,
+            config,
+            seed,
+            target
+        )
+
+        time_generation += (perf_counter() - start) * 1000
+
+        # --------------------------------------
+        # 4.2 Extraccion de caracteristicas
+        # --------------------------------------
+        start = perf_counter()
+
         feature_dict = extract_ml_feature_dict(grid)
-        sample = pd.DataFrame([{name: feature_dict[name] for name in features}], columns=features)
+
+        sample = pd.DataFrame(
+            [{name: feature_dict[name] for name in features}],
+            columns=features
+        )
+
+        time_features += (perf_counter() - start) * 1000
+
+        # --------------------------------------
+        # 4.3 Prediccion Machine Learning
+        # --------------------------------------
+        start = perf_counter()
+
         predicted_id = int(model.predict(sample)[0])
-        inverse = {int(v): k for k, v in encoding.items()}
+
         predicted = inverse[predicted_id]
+
         confidence = None
         target_probability = 0.0
+
         if hasattr(model, "predict_proba"):
+
             probabilities = model.predict_proba(sample)[0]
-            class_to_pos = {int(cls): pos for pos, cls in enumerate(model.classes_)}
-            target_probability = float(probabilities[class_to_pos[encoding[target]]])
+
+            class_to_pos = {
+                int(cls): pos
+                for pos, cls in enumerate(model.classes_)
+            }
+
+            target_probability = float(
+                probabilities[
+                    class_to_pos[encoding[target]]
+                ]
+            )
+
             confidence = float(max(probabilities))
+
+        time_prediction += (perf_counter() - start) * 1000
+
+        # --------------------------------------
+        # 4.4 Evaluacion del mapa
+        # --------------------------------------
+        start = perf_counter()
+
+        metrics = evaluar_mapa(
+            grid,
+            ml_features=feature_dict
+        )
+
+        time_evaluation += (perf_counter() - start) * 1000
+
+        # --------------------------------------
+        # 4.5 Almacenamiento del candidato
+        # --------------------------------------
         candidates.append({
-            "map": grid, "seed": seed, "predicted_complexity": predicted,
+            "map": grid,
+            "seed": seed,
+            "predicted_complexity": predicted,
             "matches_request": predicted == target,
-            "confidence": None if confidence is None else round(confidence, 4),
-            "target_probability": round(target_probability, 4),
-            "metrics": evaluar_mapa(grid), "ml_features": feature_dict,
+            "confidence": (
+                None
+                if confidence is None
+                else round(confidence, 4)
+            ),
+            "target_probability": round(
+                target_probability, 4
+            ),
+            "metrics": metrics,
+            "ml_features": feature_dict,
             "generated_parameters": generated_parameters,
         })
 
-    # Primero coincidencia con la complejidad solicitada; después probabilidad/confianza.
-    best = max(candidates, key=lambda x: (x["matches_request"], x["target_probability"], x["confidence"] or 0.0))
+    elapsed_candidates = (
+        perf_counter() - start_candidates
+    ) * 1000
+
+    # ==========================================
+    # 5. Seleccion del mejor mapa
+    # ==========================================
+    start_selection = perf_counter()
+
+    best = max(
+        candidates,
+        key=lambda x: (
+            x["matches_request"],
+            x["target_probability"],
+            x["confidence"] or 0.0
+        )
+    )
+
     winner = manifest["winners"][generator]
-    return {
+
+    elapsed_selection = (
+        perf_counter() - start_selection
+    ) * 1000
+
+    # ==========================================
+    # 6. Resultado final
+    # ==========================================
+    result = {
         **best,
         "algorithm": generator,
         "requested_complexity": target,
@@ -108,3 +278,25 @@ def generate_adaptive_map_ml(generator, config, attempts=10, requested_complexit
         "attempts": attempts,
         "parameters": config,
     }
+
+    elapsed_total = (
+        perf_counter() - start_total
+    ) * 1000
+
+    # ==========================================
+    # 7. Reporte de diagnostico HU-78
+    # ==========================================
+    logging.warning("[HU-78] ===================================")
+    logging.warning("[HU-78] Algoritmo: %s | Intentos: %s", generator, attempts)
+    logging.warning("[HU-78] Carga modelo ML: %.2f ms", elapsed_model)
+    logging.warning("[HU-78] Carga configuracion: %.2f ms", elapsed_config)
+    logging.warning("[HU-78] Generacion procedural: %.2f ms",time_generation)
+    logging.warning("[HU-78] Extraccion caracteristicas: %.2f ms", time_features)
+    logging.warning("[HU-78] Prediccion ML: %.2f ms", time_prediction)
+    logging.warning("[HU-78] Evaluacion mapas: %.2f ms", time_evaluation)
+    logging.warning("[HU-78] Total ciclo candidatos: %.2f ms", elapsed_candidates)
+    logging.warning("[HU-78] Seleccion mejor mapa: %.2f ms", elapsed_selection)
+    logging.warning("[HU-78] TOTAL SERVICIO: %.2f ms", elapsed_total)
+    logging.warning("[HU-78] ===================================")
+
+    return result

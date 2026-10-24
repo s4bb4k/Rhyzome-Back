@@ -7,6 +7,7 @@ from application.services import adaptive_generator_ml as module
 
 
 def test_load_model_missing(tmp_path, monkeypatch):
+    module._load_model.cache_clear()
     monkeypatch.setattr(module, "MODEL_DIR", tmp_path)
 
     with pytest.raises(FileNotFoundError, match="No existe"):
@@ -14,6 +15,7 @@ def test_load_model_missing(tmp_path, monkeypatch):
 
 
 def test_load_model_existing(tmp_path, monkeypatch):
+    module._load_model.cache_clear()
     monkeypatch.setattr(module, "MODEL_DIR", tmp_path)
 
     model_path = tmp_path / "best_cellular.joblib"
@@ -112,7 +114,11 @@ def setup_adaptive_mocks(monkeypatch, model):
 
         raise ValueError(f"Archivo inesperado: {name}")
 
-    monkeypatch.setattr(module, "_read_json", fake_read_json)
+    monkeypatch.setattr(
+        module,
+        "_read_json",
+        fake_read_json,
+    )
 
     monkeypatch.setattr(
         module,
@@ -120,10 +126,11 @@ def setup_adaptive_mocks(monkeypatch, model):
         lambda grid: {"floor_ratio": 0.5},
     )
 
+    # HU-78: Compatibilidad con reutilización de características ML
     monkeypatch.setattr(
         module,
         "evaluar_mapa",
-        lambda grid: {"quality": 50.0},
+        lambda grid, ml_features=None: {"quality": 50.0},
     )
 
 
@@ -223,3 +230,17 @@ def test_adaptive_rejects_invalid_complexity(monkeypatch):
             attempts=3,
             requested_complexity="extremo",
         )
+
+@pytest.fixture(autouse=True)
+def limpiar_cache_modelos():
+    cache_clear = getattr(module._load_model, "cache_clear", None)
+
+    if callable(cache_clear):
+        cache_clear()
+
+    yield
+
+    cache_clear = getattr(module._load_model, "cache_clear", None)
+
+    if callable(cache_clear):
+        cache_clear()

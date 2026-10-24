@@ -95,7 +95,13 @@ def generate_adaptive_map_ml(
     elapsed_model = (perf_counter() - start_model) * 1000
 
     logging.warning("[HU-78] Carga del modelo ML: %.2f ms", elapsed_model)
-    logging.warning("[HU-78] Estado cache ML: %s", _load_model.cache_info())
+    cache_info = getattr(_load_model, "cache_info", None)
+
+    if callable(cache_info):
+        logging.warning(
+            "[HU-78] Estado cache ML: %s",
+            cache_info()
+        )
 
     # ==========================================
     # 2. Carga de archivos de configuracion

@@ -1,0 +1,64 @@
+
+name: Rhyzome Backend - CI
+
+on:
+  push:
+    branches:
+      - desarrollo
+      - release
+      - master
+
+  pull_request:
+    branches:
+      - release
+      - master
+
+  workflow_dispatch:
+
+jobs:
+  backend-tests:
+    name: Pruebas y cobertura Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Crear carpeta de reportes
+        run: mkdir -p reports
+
+      - name: Ejecutar pruebas y generar reportes
+        run: |
+          python -m pytest -v \
+            --junitxml=reports/report_unit.xml \
+            --html=reports/pruebas.html \
+            --self-contained-html \
+            --cov=application \
+            --cov=services \
+            --cov=experiment \
+            --cov-report=term-missing \
+            --cov-report=html:reports/coverage \
+            --cov-report=xml:reports/coverage.xml
+
+      - name: Guardar reportes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rhyzome-backend-reports
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 30

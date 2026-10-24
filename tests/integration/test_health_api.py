@@ -1,0 +1,24 @@
+
+def test_health_returns_200(client):
+    response = client.get("/api/health")
+
+    assert response.status_code == 200
+    assert response.is_json
+
+    body = response.get_json()
+    assert body["status"] == "ok"
+    assert body["service"] == "rhizome-api"
+
+
+def test_unknown_endpoint_returns_404(client):
+    response = client.get("/api/no-existe")
+
+    assert response.status_code == 404
+    assert response.get_json()["status"] == "error"
+
+
+def test_wrong_http_method_returns_405(client):
+    response = client.get("/api/maps/generate")
+
+    assert response.status_code == 405
+    assert response.get_json()["status"] == "error"

@@ -4,6 +4,12 @@ from application.generators.cellular_automata import generate_map as generate_ce
 from application.generators.perlin_noise import generate_perlin_map
 from application.services.evaluation_metrics import evaluar_mapa
 
+import logging
+from time import perf_counter
+from flask import current_app
+from time import perf_counter
+
+
 map_bp = Blueprint("maps", __name__)
 
 TERRAIN_ALIASES = {
@@ -128,6 +134,7 @@ def evaluate_map():
 
 @map_bp.post("/generate-adaptive")
 def generate_adaptive():
+    start_total = perf_counter()
     try:
         from application.services.adaptive_generator_ml import generate_adaptive_map_ml
 
@@ -158,7 +165,29 @@ def generate_adaptive():
             })
         attempts = _integer(data, "attempts", 10, 1, 50)
         complexity_ml = {"low": "bajo", "medium": "medio", "high": "alto"}[frontend["complexity"]]
-        result = generate_adaptive_map_ml(algorithm, config, attempts, complexity_ml)
+
+        start_ml = perf_counter()
+
+        result = generate_adaptive_map_ml(
+            algorithm, config, attempts, complexity_ml
+        )
+
+        elapsed_ml = (perf_counter() - start_ml) * 1000
+
+        current_app.logger.warning(
+            "[HU-78] Generacion adaptativa: %.2f ms | algoritmo=%s | attempts=%s",
+            elapsed_ml,
+            algorithm,
+            attempts
+        )
+
+        elapsed_total = (perf_counter() - start_total) * 1000
+
+        current_app.logger.warning(
+            "[HU-78] Tiempo total backend: %.2f ms",
+            elapsed_total
+        )
+
         return jsonify({"status": "success", "ui_config": frontend, **result})
     except ValueError as exc:
         return jsonify({"status": "error", "message": str(exc)}), 400

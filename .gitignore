@@ -65,3 +65,24 @@ application/services/__pycache__
 # Caché de Python
 __pycache__/
 *.py[cod]
+
+# ==========================================
+# HU-25 - Reportes de pruebas y cobertura
+# ==========================================
+
+# Reportes generados
+reports/
+report_unit.xml
+
+# Archivos de cobertura
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Caché de pytest
+.pytest_cache/
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc

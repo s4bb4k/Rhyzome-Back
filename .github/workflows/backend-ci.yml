@@ -17,7 +17,7 @@ on:
 
 jobs:
   backend-tests:
-    name: Pruebas automatizadas Backend
+    name: Pruebas y cobertura Backend
     runs-on: ubuntu-latest
 
     steps:
@@ -38,15 +38,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Ejecutar pruebas
+      - name: Crear carpeta de reportes
+        run: mkdir -p reports
+
+      - name: Ejecutar pruebas y generar reportes
         run: |
           python -m pytest -v \
-            --junitxml=report_unit.xml
+            --junitxml=reports/report_unit.xml \
+            --html=reports/pruebas.html \
+            --self-contained-html \
+            --cov=application \
+            --cov=services \
+            --cov=experiment \
+            --cov-report=term-missing \
+            --cov-report=html:reports/coverage \
+            --cov-report=xml:reports/coverage.xml
 
-      - name: Guardar reporte
+      - name: Guardar reportes
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: backend-test-report
-          path: report_unit.xml
+          name: rhyzome-backend-reports
+          path: reports/
           if-no-files-found: warn
+          retention-days: 30

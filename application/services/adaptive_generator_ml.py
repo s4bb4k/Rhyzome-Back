@@ -57,6 +57,9 @@ def _candidate(generator, config, seed, target):
 
 
 def generate_adaptive_map_ml(generator, config, attempts=10, requested_complexity="medio"):
+    if not isinstance(attempts, int) or not 1 <= attempts <= 50:
+        raise ValueError("'attempts' debe estar entre 1 y 50")
+
     model = _load_model(generator)
     feature_config = _read_json("feature_config.json")
     manifest = _read_json("experiment_manifest.json")

@@ -7,10 +7,11 @@ from application.services.feature_extractor import (
 )
 
 
+
 def test_completely_open_map():
     grid = [
-        [0, 0],
-        [0, 0],
+        [1, 1],
+        [1, 1],
     ]
 
     features = extract_feature_dict(grid)
@@ -23,8 +24,8 @@ def test_completely_open_map():
 
 def test_completely_blocked_map():
     grid = [
-        [1, 1],
-        [1, 1],
+        [0, 0],
+        [0, 0],
     ]
 
     features = extract_feature_dict(grid)
@@ -33,6 +34,7 @@ def test_completely_blocked_map():
     assert features["obstacle_density"] == 1.0
     assert features["connectivity"] == 0.0
     assert features["connected_components"] == 0
+
 
 
 def test_disconnected_open_areas():

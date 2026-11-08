@@ -21,12 +21,34 @@ TERRAIN_ALIASES = {
 
 
 def _integer(data, field, default, minimum, maximum):
+    raw_value = data.get(field, default)
+
     try:
-        value = int(data.get(field, default))
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"'{field}' debe ser un número entero") from exc
+        # Rechazar valores booleanos
+        if isinstance(raw_value, bool):
+            raise ValueError()
+
+        # Rechazar números decimales que no sean enteros
+        if isinstance(raw_value, float) and not raw_value.is_integer():
+            raise ValueError()
+
+        # Rechazar cadenas con representación decimal
+        if isinstance(raw_value, str):
+            if not raw_value.strip().lstrip("+-").isdigit():
+                raise ValueError()
+
+        value = int(raw_value)
+
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(
+            f"'{field}' debe ser un número entero válido"
+        ) from exc
+
     if not minimum <= value <= maximum:
-        raise ValueError(f"'{field}' debe estar entre {minimum} y {maximum}")
+        raise ValueError(
+            f"'{field}' debe estar entre {minimum} y {maximum}"
+        )
+
     return value
 
 

@@ -72,7 +72,6 @@ __pycache__/
 
 # Reportes generados
 reports/
-report_unit.xml
 
 # Archivos de cobertura
 .coverage

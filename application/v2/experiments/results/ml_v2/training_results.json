@@ -1,0 +1,190 @@
+{
+  "logistic_regression": {
+    "train": {
+      "accuracy": 0.8900973096737264,
+      "macro_f1": 0.8891114400832575
+    },
+    "validation": {
+      "accuracy": 0.878,
+      "macro_f1": 0.8775144269963047
+    }
+  },
+  "knn": {
+    "train": {
+      "accuracy": 0.9851173440183171,
+      "macro_f1": 0.9851178952124351
+    },
+    "validation": {
+      "accuracy": 0.9813333333333333,
+      "macro_f1": 0.9813239322499551
+    }
+  },
+  "random_forest": {
+    "train": {
+      "accuracy": 1.0,
+      "macro_f1": 1.0
+    },
+    "validation": {
+      "accuracy": 0.984,
+      "macro_f1": 0.9839850656785084
+    },
+    "test": {
+      "accuracy": 0.9808201058201058,
+      "macro_f1": 0.9808194112497134
+    }
+  },
+  "svm": {
+    "train": {
+      "accuracy": 0.9749570692615913,
+      "macro_f1": 0.9749361856455371
+    },
+    "validation": {
+      "accuracy": 0.9766666666666667,
+      "macro_f1": 0.9766571275120443
+    }
+  },
+  "gradient_boosting": {
+    "train": {
+      "accuracy": 0.9896966227819118,
+      "macro_f1": 0.9896970160590959
+    },
+    "validation": {
+      "accuracy": 0.978,
+      "macro_f1": 0.9779662212594683
+    }
+  },
+  "mlp": {
+    "train": {
+      "accuracy": 0.979965655409273,
+      "macro_f1": 0.9799648992178182
+    },
+    "validation": {
+      "accuracy": 0.978,
+      "macro_f1": 0.9779729472371507
+    }
+  },
+  "selected_model": "random_forest",
+  "test_classification_report": {
+    "bajo": {
+      "precision": 0.9820717131474104,
+      "recall": 0.9781746031746031,
+      "f1-score": 0.9801192842942346,
+      "support": 504.0
+    },
+    "medio": {
+      "precision": 0.9702970297029703,
+      "recall": 0.9722222222222222,
+      "f1-score": 0.9712586719524281,
+      "support": 504.0
+    },
+    "alto": {
+      "precision": 0.9900990099009901,
+      "recall": 0.9920634920634921,
+      "f1-score": 0.9910802775024777,
+      "support": 504.0
+    },
+    "accuracy": 0.9808201058201058,
+    "macro avg": {
+      "precision": 0.9808225842504569,
+      "recall": 0.9808201058201057,
+      "f1-score": 0.9808194112497134,
+      "support": 1512.0
+    },
+    "weighted avg": {
+      "precision": 0.980822584250457,
+      "recall": 0.9808201058201058,
+      "f1-score": 0.9808194112497135,
+      "support": 1512.0
+    }
+  },
+  "test_confusion_matrix": [
+    [
+      493,
+      11,
+      0
+    ],
+    [
+      9,
+      490,
+      5
+    ],
+    [
+      0,
+      4,
+      500
+    ]
+  ],
+  "test_by_biome": {
+    "bosque": {
+      "accuracy": 0.9920634920634921,
+      "macro_f1": 0.9920632411067194,
+      "records": 378
+    },
+    "ciudad": {
+      "accuracy": 0.9973544973544973,
+      "macro_f1": 0.9973544556950066,
+      "records": 378
+    },
+    "desierto": {
+      "accuracy": 0.9973544973544973,
+      "macro_f1": 0.9973544556950066,
+      "records": 378
+    },
+    "mazmorra": {
+      "accuracy": 0.9365079365079365,
+      "macro_f1": 0.9364549456356143,
+      "records": 378
+    }
+  },
+  "class_order": [
+    "bajo",
+    "medio",
+    "alto"
+  ],
+  "class_encoding": {
+    "bajo": 0,
+    "medio": 1,
+    "alto": 2
+  },
+  "feature_order": [
+    "floor_ratio",
+    "n_regions",
+    "largest_region_ratio",
+    "edge_density",
+    "row_entropy",
+    "col_entropy",
+    "local_variance",
+    "perimeter_area_ratio"
+  ],
+  "dataset_size": 10000,
+  "partitions": {
+    "train": {
+      "records": 6988,
+      "unique_seeds": 583,
+      "class_counts": {
+        "bajo": 2330,
+        "medio": 2329,
+        "alto": 2329
+      }
+    },
+    "validation": {
+      "records": 1500,
+      "unique_seeds": 125,
+      "class_counts": {
+        "bajo": 500,
+        "medio": 500,
+        "alto": 500
+      }
+    },
+    "test": {
+      "records": 1512,
+      "unique_seeds": 126,
+      "class_counts": {
+        "bajo": 504,
+        "medio": 504,
+        "alto": 504
+      }
+    }
+  },
+  "label_semantics": "perfil_generativo_solicitado_no_dificultad_jugable_validada"
+}

@@ -6,6 +6,7 @@ from flask_cors import CORS
 from application.routes.auth_routes import auth_bp
 from application.routes.experiment_routes import experiment_bp
 from application.routes.map_routes import map_bp
+from application.v2.routes.map_routes import v2_map_bp
 
 
 def create_app():
@@ -49,6 +50,8 @@ def create_app():
         experiment_bp, url_prefix="/api/experiment"
     )
 
+    app.register_blueprint(v2_map_bp, url_prefix="/api/v2/maps")
+
     # 5. Health check
     @app.get("/api/health")
     def health():
@@ -72,13 +75,6 @@ def create_app():
         }), 405
 
     return app
-
-    @app.route("/api/python-version", methods=["GET"])
-    def python_version():
-        return jsonify({
-            "python_version": sys.version.split()[0],
-            "python_full_version": sys.version,
-        })
 app = create_app()
 
 if __name__ == "__main__":

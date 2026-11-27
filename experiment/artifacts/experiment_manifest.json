@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "generated_at_utc": "2026-10-04T21:40:36.697021+00:00",
-  "generated_by": "experimento_rhyzome_10000_ARTEFACTOS_BACKEND.ipynb",
+  "generated_by": "experimento_clasificacion_especializada.ipynb",
   "dataset": {
     "total_maps": 10000,
     "by_generator": {
